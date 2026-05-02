@@ -1,0 +1,49 @@
+# Build output
+bin/
+obj/
+publish/
+Release/
+Debug/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+*.rsuser
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# NuGet
+*.nupkg
+/packages/
+
+# Unity generated folders
+UI/Unturned/Library/
+UI/Unturned/Temp/
+UI/Unturned/Obj/
+UI/Unturned/Build/
+UI/Unturned/Builds/
+UI/Unturned/Logs/
+UI/Unturned/UserSettings/
+UI/Unturned/UIElementsSchema/
+
+# Unity generated IDE files
+UI/Unturned/.vs/
+UI/Unturned/*.csproj
+UI/Unturned/*.sln
+
+# Release artifacts published through GitHub Releases
+UI/Releases/*.unity3d
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,39 @@
+# Unity generated folders
+/Library/
+/Temp/
+/Obj/
+/Build/
+/Builds/
+/Logs/
+/UserSettings/
+/UIElementsSchema/
+
+# IDE and generated project files
+/.vs/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity build artifacts
+*.unity3d
+*.apk
+*.aab
+*.unitypackage
+
+# Crash reports and local diagnostics
+/sysinfo.txt
+/*.stackdump
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
