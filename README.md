@@ -1,21 +1,51 @@
-# Unturned-Announcement-UI-Plugin
+# Unturned Announcement UI Plugin
 
-> Unturned 服务器公告 UI 插件：把服务器规则、轮播公告和临时强制公告显示在自定义 UI 中，也可以同步发送聊天公告。
+<p align="center">
+  <img src="docs/images/announcement-ui/md文档头图.png" alt="Unturned 服务器公告 UI 插件封面" width="920">
+</p>
 
-## ✨ 功能亮点
+<p align="center">
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-2f80ed?style=for-the-badge"></a>
+  <img alt=".NET Framework" src="https://img.shields.io/badge/.NET_Framework-4.8-4f8cff?style=for-the-badge">
+  <img alt="Game" src="https://img.shields.io/badge/Unturned-RocketMod-16a4d8?style=for-the-badge">
+  <img alt="UI" src="https://img.shields.io/badge/UI-Unity_Effect-38bdf8?style=for-the-badge">
+</p>
 
-- 🖥️ **UI 公告面板**：玩家进服后自动加载公告 UI。
-- 📜 **服务器规则展示**：从配置文件读取规则文本并显示在 UI 中。
-- 📢 **公告轮播**：按配置时间间隔循环展示公告内容。
-- ⚡ **临时强制公告**：管理员可以用命令临时覆盖轮播公告。
-- 🎨 **富文本支持**：支持颜色、字号、加粗、斜体和换行。
-- 🧩 **可自定义 UI**：可使用默认创意工坊 UI，也可以导入 Unity 自行修改后重新上传。
+> 一个面向 Unturned 服务器的公告 UI 插件。玩家进服后加载自定义 UI，用于展示服务器规则、轮播公告、临时强制公告，并同步发送聊天公告。
 
-## 📦 下载与安装
+## 概览
+
+`Unturned Announcement UI Plugin` 用于统一展示服务器规则、活动通知、维护提醒和临时广播。插件内置默认 UI，也支持使用 Unity 修改界面后重新上传到 Steam 创意工坊。
+
+| 能力 | 说明 |
+| --- | --- |
+| UI 公告面板 | 玩家进服后自动加载公告 UI，可通过命令控制显示状态 |
+| 服务器规则展示 | 从配置文件读取规则文本，并显示在独立规则面板中 |
+| 公告轮播 | 按配置间隔循环展示多条公告 |
+| 临时强制公告 | 管理员可用命令临时覆盖轮播内容 |
+| 聊天同步 | 可选择把 UI 公告同步发送到游戏聊天 |
+| 富文本格式 | 支持颜色、字号、加粗、斜体、换行和变量替换 |
+| 自定义 UI | 基于 Unity 工程调整图片、字体、布局和样式 |
+
+## 截图展示
+
+### 游戏内 UI
+
+| 规则面板与公告轮播 | 强制公告 |
+| --- | --- |
+| <img src="docs/images/announcement-ui/游戏内展示图.png" alt="规则面板与公告轮播" width="520"> | <img src="docs/images/announcement-ui/游戏内展示图-1.png" alt="强制公告展示" width="520"> |
+
+### UI 开关与加载状态
+
+| 关闭全部 UI | 插件加载成功 |
+| --- | --- |
+| <img src="docs/images/announcement-ui/游戏内展示图-2.png" alt="关闭全部 UI 后的游戏内提示" width="520"> | <img src="docs/images/announcement-ui/服务器加载成功.png" alt="服务器控制台加载成功日志" width="520"> |
+
+## 下载与安装
 
 1. 打开 GitHub Releases，下载 `Unturned-Announcement-UI-Plugin-v1.0.0.zip`。
-2. 解压后可以看到 DLL 文件：`[基佬]UI公告.dll`。
-3. 将 DLL 放入服务器的 Rocket 插件目录，例如：
+2. 解压后取得插件文件：`[基佬]UI公告.dll`。
+3. 将 DLL 放入 Rocket 插件目录：
 
 ```text
 Servers/<服务器名>/Rocket/Plugins/
@@ -24,17 +54,37 @@ Servers/<服务器名>/Rocket/Plugins/
 4. 重启服务器，插件会自动加载并生成配置文件。
 5. 确保服务器已加载对应的 UI Effect 资源。
 
-## 🧱 默认 UI
+启动成功后，控制台输出插件信息、命令注册信息和当前 `EffectId`：
 
-如果你不想自己上传 UI 到创意工坊，可以直接使用我已经上传好的默认 UI：
+<p align="center">
+  <img src="docs/images/announcement-ui/服务器加载成功.png" alt="服务器加载成功" width="720">
+</p>
 
-🔗 [Steam 创意工坊：公告UI](https://steamcommunity.com/sharedfiles/filedetails/?id=3663166920)
+## 默认 UI 与创意工坊
 
-默认配置中的 `EffectId` 为 `45685`。如果你使用默认 UI，通常不需要修改这个值。
+默认创意工坊资源：
 
-如果 Steam 创意工坊链接无法订阅、失效，或服务器环境无法自动下载创意工坊内容，可以下载 Release 附件中的 `Effect.unity3d`，再按下方自定义 UI 流程自行导入和上传。
+[Steam 创意工坊：公告 UI](https://steamcommunity.com/sharedfiles/filedetails/?id=3663166920)
 
-## 🚀 命令与权限
+默认配置中的 `EffectId` 为 `45685`。使用默认 UI 时保持该值。
+
+服务器无法自动下载创意工坊内容时，在 `WorkshopDownloadConfig.json` 中加入默认 UI 的文件 ID：
+
+```json
+{
+  "File_IDs": [
+    3663166920
+  ]
+}
+```
+
+<p align="center">
+  <img src="docs/images/announcement-ui/配置WorkshopDownloadConfig.json文件示意图.png" alt="WorkshopDownloadConfig.json 配置示意图" width="720">
+</p>
+
+创意工坊链接失效时，下载 Release 附件中的 `Effect.unity3d`，再按下方自定义 UI 流程导入和上传。
+
+## 命令与权限
 
 | 命令 | 权限 | 说明 |
 | --- | --- | --- |
@@ -46,19 +96,19 @@ Servers/<服务器名>/Rocket/Plugins/
 示例：
 
 ```text
-/ann {color=#ff0000}服务器将在 5 分钟后维护{/color} 60
+/ann {color=#38bdf8}{b}服务器将在 5 分钟后维护{/b}{/color} 60
 ```
 
-## ⚙️ 配置说明
+## 配置说明
 
-插件首次启动后会生成配置文件，可按服务器需求修改。
+插件首次启动后会生成配置文件。配置项控制公告内容、轮播间隔、聊天同步和 UI 默认显示状态。
 
 | 配置项 | 说明 |
 | --- | --- |
 | `EffectId` | UI Effect ID，默认 `45685` |
 | `ShowUIByDefault` | 玩家进服后是否默认显示 UI |
 | `EnableUIAnnouncements` | 是否启用 UI 公告 |
-| `EnableChatAnnouncements` | 是否同时发送聊天公告 |
+| `EnableChatAnnouncements` | 是否同步发送聊天公告 |
 | `ChatMessageColor` | 聊天公告颜色 |
 | `ChatAvatarURL` | 聊天公告头像 URL，留空则不显示头像 |
 | `AnnouncementIntervalSeconds` | 公告轮播间隔，单位秒 |
@@ -69,19 +119,21 @@ Servers/<服务器名>/Rocket/Plugins/
 | `HelpText` | UI 底部提示文本 |
 | `Announcements` | 公告轮播列表 |
 
-## 🧾 富文本与变量
+## 富文本与变量
 
-配置文件中使用 `{}` 书写富文本，插件会自动转换为 Unity/TMP 可识别的 `<>`。
+配置文件中使用 `{}` 书写富文本。插件会自动转换为 Unity / TextMesh Pro 可识别的 `<>` 格式，避免 XML 风格标签被配置文件误处理。
+
+### 富文本写法
 
 | 写法 | 效果 |
 | --- | --- |
 | `{b}文字{/b}` | 加粗 |
 | `{i}文字{/i}` | 斜体 |
-| `{color=#3498db}文字{/color}` | 设置颜色 |
+| `{color=#38bdf8}文字{/color}` | 设置颜色 |
 | `{size=20}文字{/size}` | 设置字号 |
 | `{br}` | 换行 |
 
-可用变量：
+### 可用变量
 
 | 变量 | 说明 |
 | --- | --- |
@@ -93,17 +145,20 @@ Servers/<服务器名>/Rocket/Plugins/
 | `{server_map}` | 地图名 |
 | `{server_mode}` | 游戏模式 |
 
-## 🎨 自定义 UI 并上传创意工坊
+## 自定义 UI
 
-1. 从 GitHub Release 下载 `Effect.unity3d`，并导入到你的 Unity 项目中。
-2. 推荐使用 Unity `2022.3.62f3` 打开仓库中的 `UI/Unturned` 工程。
-3. 根据需要调整 UI 的图片、字体、布局和样式。
-4. 不要重命名层级结构中的任何对象，因为插件会通过对象名称查找 UI 元素。
-5. 重新上传到 Steam 创意工坊时，请使用唯一的 GUID 和 ID。
-6. 上传后，将新 UI 的 Effect ID 写入插件配置文件中的 `EffectId`。
-7. 重启服务器并验证 UI 是否正常显示。
+仓库内包含 Unity 工程，用于调整默认 UI。使用 Unity `2022.3.62f3` 打开 `UI/Unturned`。
 
-插件依赖的关键对象名包括：
+自定义流程：
+
+1. 从 GitHub Release 下载 `Effect.unity3d`，或使用仓库中的 Unity 工程。
+2. 调整 UI 图片、字体、布局和样式。
+3. 不要重命名层级结构中的关键对象，插件会通过对象名称查找 UI 元素。
+4. 重新上传到 Steam 创意工坊，并使用唯一的 GUID 和 ID。
+5. 将新 UI 的 Effect ID 写入配置文件中的 `EffectId`。
+6. 重启服务器并验证 UI 是否正常显示。
+
+关键对象名：
 
 ```text
 Canvas
@@ -118,7 +173,7 @@ HelpText
 AnnouncementText
 ```
 
-## 🛠️ 开发构建
+## 开发构建
 
 本项目使用 `.NET Framework 4.8`，依赖 `RestoreMonarchy.RocketRedist`。
 
@@ -133,6 +188,6 @@ Release DLL 输出位置：
 bin/Release/net48/[基佬]UI公告.dll
 ```
 
-## 📄 License
+## License
 
-本项目使用 [MIT License](LICENSE) 开源。
+本项目基于 [MIT License](LICENSE) 开源发布。MIT 是标准开源协议，允许使用、复制、修改、分发和再许可；使用者需要保留原始版权与许可声明。

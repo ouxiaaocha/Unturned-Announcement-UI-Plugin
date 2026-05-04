@@ -65,7 +65,7 @@ namespace AnnounceUI
                 "公告示例：{color=#3498db}蓝色文字{/color} + {size=20}大号字体{/size}",
                 "支持换行：第一行{br}第二行",
                 "使用 /ANNUI 01 关闭规则UI，/ANNUI 02 关闭公告UI",
-                "你可以在配置里继续添加更多公告条目"
+                "公告条目支持继续扩展"
             };
         }
     }
