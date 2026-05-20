@@ -22,7 +22,7 @@ namespace AnnounceUI
 
         public static void ReplaceVariables(ref string text, IRocketPlayer player)
         {
-            string playerName = player != null ? player.DisplayName : string.Empty;
+            string playerName = player != null ? SanitizePlayerName(player.DisplayName) : string.Empty;
             string playerId = player != null ? player.Id : string.Empty;
 
             string serverName = Provider.serverName;
@@ -39,6 +39,12 @@ namespace AnnounceUI
                 .Replace("{server_maxplayers}", maxPlayers)
                 .Replace("{server_map}", map)
                 .Replace("{server_mode}", mode);
+        }
+
+        private static string SanitizePlayerName(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return string.Empty;
+            return name.Replace("{", "").Replace("}", "");
         }
     }
 }

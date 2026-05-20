@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-	  <LangVersion>latest</LangVersion>
-	  <RootNamespace>ouxiaocha.服务器公告带UI</RootNamespace>
-    <Version>1.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>AnnounceUI</RootNamespace>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="RestoreMonarchy.RocketRedist" Version="3.*" ExcludeAssets="runtime" />
+    <PackageReference Include="RestoreMonarchy.RocketRedist" Version="3.*" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>

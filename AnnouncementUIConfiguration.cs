@@ -72,9 +72,9 @@ namespace AnnounceUI
 
     internal class PlayerUIState
     {
-        public bool EffectSent;
-        public bool AllEnabled = true;
-        public bool RulesEnabled = true;
-        public bool AnnouncementsEnabled = true;
+        public bool EffectSent { get; set; }
+        public bool AllEnabled { get; set; } = true;
+        public bool RulesEnabled { get; set; } = true;
+        public bool AnnouncementsEnabled { get; set; } = true;
     }
 }

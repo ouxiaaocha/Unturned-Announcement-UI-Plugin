@@ -12,7 +12,7 @@ namespace AnnounceUI
 
         public string Name => "ann";
         public string Help => "强制广播一条公告（优先于轮播）";
-        public string Syntax => "/ann <文字> <时间(秒)>";
+        public string Syntax => "/ann <时间(秒)> <文字>";
 
         public List<string> Aliases => new List<string>();
 
@@ -36,14 +36,19 @@ namespace AnnounceUI
                 return;
             }
 
-            string last = command[command.Length - 1];
-            if (!int.TryParse(last, out int durationSeconds))
+            string first = command[0];
+            if (!int.TryParse(first, out int durationSeconds))
             {
                 UnturnedChat.Say(player, plugin.Translate("ann_time_invalid"), Color.yellow);
                 return;
             }
 
-            string message = string.Join(" ", command, 0, command.Length - 1);
+            string message = string.Join(" ", command, 1, command.Length - 1);
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                UnturnedChat.Say(player, plugin.Translate("ann_usage"), Color.yellow);
+                return;
+            }
 
             plugin.StartForcedAnnouncement(message, durationSeconds);
 

@@ -24,6 +24,7 @@ namespace AnnounceUI
         private readonly Dictionary<ulong, PlayerUIState> _states = new Dictionary<ulong, PlayerUIState>();
 
         private Timer _timer;
+        private Timer _overrideTimer;
         private int _announceIndex = 0;
         private string _currentAnnouncementRaw = null;
 
@@ -40,9 +41,10 @@ namespace AnnounceUI
             { "annui_announce_on", "AnnUI: 已开启 服务器公告UI (02)" },
             { "annui_announce_off", "AnnUI: 已关闭 服务器公告UI (02)" },
             { "annui_usage", "用法: /ANNUI | /ANNUI 01 | /ANNUI 02" },
+            { "annui_all_off_hint", "AnnUI: 总开关已关闭，请先使用 /ANNUI 开启总开关" },
 
-            { "ann_usage", "用法: /ann <文字> <时间(秒)>" },
-            { "ann_time_invalid", "时间必须是数字(秒)。示例: /ann 维护中 60" },
+            { "ann_usage", "用法: /ann <时间(秒)> <文字>" },
+            { "ann_time_invalid", "时间必须是数字(秒)。示例: /ann 60 维护中" },
             { "ann_sent", "已强制广播 {0} 秒。" },
 
             { "no_plugin_instance", "插件未加载或实例为空，请重启服务器。" },
@@ -74,6 +76,7 @@ namespace AnnounceUI
             U.Events.OnPlayerDisconnected -= OnPlayerDisconnected;
 
             StopAnnouncerTimer();
+            StopOverrideTimer();
             ClearUIForAllOnlinePlayers();
 
             _states.Clear();
@@ -107,25 +110,32 @@ namespace AnnounceUI
         {
             if (durationSeconds <= 0) durationSeconds = 60;
 
-            _overrideActive = true;
-            _overrideMessageRaw = rawMessage ?? string.Empty;
-            _overrideUntilUtc = DateTime.UtcNow.AddSeconds(durationSeconds);
-
-            BroadcastAnnouncementNow(forceOverride: true);
-
-            var t = new Timer(Math.Max(1, durationSeconds) * 1000d);
-            t.AutoReset = false;
-            t.Elapsed += (s, e) =>
+            TaskDispatcher.QueueOnMainThread(() =>
             {
-                TaskDispatcher.QueueOnMainThread(() =>
+                StopOverrideTimer();
+
+                _overrideActive = true;
+                _overrideMessageRaw = rawMessage ?? string.Empty;
+                _overrideUntilUtc = DateTime.UtcNow.AddSeconds(durationSeconds);
+
+                BroadcastAnnouncementNow(forceOverride: true);
+
+                var t = new Timer(Math.Max(1, durationSeconds) * 1000d);
+                t.AutoReset = false;
+                t.Elapsed += (s, e) =>
                 {
-                    _overrideActive = false;
-                    _overrideMessageRaw = null;
-                    BroadcastAnnouncementNow(forceOverride: false);
-                    t.Dispose();
-                });
-            };
-            t.Start();
+                    TaskDispatcher.QueueOnMainThread(() =>
+                    {
+                        _overrideActive = false;
+                        _overrideMessageRaw = null;
+                        _overrideTimer = null;
+                        BroadcastAnnouncementNow(forceOverride: false);
+                        t.Dispose();
+                    });
+                };
+                _overrideTimer = t;
+                t.Start();
+            });
         }
 
         private void StartAnnouncerTimer()
@@ -147,6 +157,16 @@ namespace AnnounceUI
                 _timer.Stop();
                 _timer.Dispose();
                 _timer = null;
+            }
+        }
+
+        private void StopOverrideTimer()
+        {
+            if (_overrideTimer != null)
+            {
+                _overrideTimer.Stop();
+                _overrideTimer.Dispose();
+                _overrideTimer = null;
             }
         }
 
@@ -177,7 +197,7 @@ namespace AnnounceUI
 
             string formatted = TextFormatter.Format(raw, null);
 
-            foreach (SteamPlayer sp in Provider.clients)
+            foreach (SteamPlayer sp in Provider.clients.ToList())
             {
                 UnturnedPlayer player = UnturnedPlayer.FromSteamPlayer(sp);
                 if (player == null) continue;
@@ -231,7 +251,7 @@ namespace AnnounceUI
             {
                 if (player == null)
                 {
-                    foreach (SteamPlayer sp in Provider.clients)
+                    foreach (SteamPlayer sp in Provider.clients.ToList())
                     {
                         ChatManager.serverSendMessage(
                             message,
@@ -278,7 +298,8 @@ namespace AnnounceUI
             if (!state.AllEnabled || !state.RulesEnabled) return;
 
             EnsureUIEffectSent(player, state);
-            var conn = player.Player.channel.owner.transportConnection;
+            var conn = player.Player?.channel?.owner?.transportConnection;
+            if (conn == null) return;
 
             string title = TextFormatter.Format(Configuration.Instance.ServerTitleText ?? "服务器规则", player);
             EffectManager.sendUIEffectText(EFFECT_KEY, conn, true, "ServerText", title);
@@ -307,7 +328,8 @@ namespace AnnounceUI
             string formatted = TextFormatter.Format(raw, player);
 
             EnsureUIEffectSent(player, state);
-            var conn = player.Player.channel.owner.transportConnection;
+            var conn = player.Player?.channel?.owner?.transportConnection;
+            if (conn == null) return;
             EffectManager.sendUIEffectText(EFFECT_KEY, conn, true, "AnnouncementText", formatted);
         }
 
@@ -315,7 +337,8 @@ namespace AnnounceUI
         {
             EnsureUIEffectSent(player, state);
 
-            var conn = player.Player.channel.owner.transportConnection;
+            var conn = player.Player?.channel?.owner?.transportConnection;
+            if (conn == null) return;
 
             bool showRules = state.AllEnabled && state.RulesEnabled && Configuration.Instance.EnableRulesUI;
             bool showAnn = state.AllEnabled && state.AnnouncementsEnabled && Configuration.Instance.EnableUIAnnouncements;
@@ -336,7 +359,8 @@ namespace AnnounceUI
         {
             if (state.EffectSent) return;
 
-            var conn = player.Player.channel.owner.transportConnection;
+            var conn = player.Player?.channel?.owner?.transportConnection;
+            if (conn == null) return;
             EffectManager.sendUIEffect(Configuration.Instance.EffectId, EFFECT_KEY, conn, true);
 
             state.EffectSent = true;
@@ -353,7 +377,10 @@ namespace AnnounceUI
                     var conn = p.channel.owner.transportConnection;
                     EffectManager.askEffectClearByID(effectId, conn);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"[AnnounceUI] ClearUI for player failed: {ex.Message}");
+                }
             }
         }
 
@@ -376,7 +403,11 @@ namespace AnnounceUI
 
             if (a0 == "01" || a0 == "1")
             {
-                state.AllEnabled = true;
+                if (!state.AllEnabled)
+                {
+                    Say(player, Translate("annui_all_off_hint"), Color.yellow);
+                    return;
+                }
                 state.RulesEnabled = !state.RulesEnabled;
                 ApplyVisibility(player, state);
 
@@ -388,7 +419,11 @@ namespace AnnounceUI
 
             if (a0 == "02" || a0 == "2")
             {
-                state.AllEnabled = true;
+                if (!state.AllEnabled)
+                {
+                    Say(player, Translate("annui_all_off_hint"), Color.yellow);
+                    return;
+                }
                 state.AnnouncementsEnabled = !state.AnnouncementsEnabled;
                 ApplyVisibility(player, state);
 
