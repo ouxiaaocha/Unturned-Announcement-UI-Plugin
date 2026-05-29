@@ -76,5 +76,15 @@ namespace AnnounceUI
         public bool AllEnabled { get; set; } = true;
         public bool RulesEnabled { get; set; } = true;
         public bool AnnouncementsEnabled { get; set; } = true;
+
+        /// <summary>
+        /// 玩家打开了游戏界面时，暂时隐藏插件 UI
+        /// </summary>
+        public bool IsHiddenByGameUI { get; set; }
+
+        /// <summary>
+        /// 背包是否打开（通过手势事件 INVENTORY_START/INVENTORY_STOP 检测）
+        /// </summary>
+        public bool IsInventoryOpen { get; set; }
     }
 }
