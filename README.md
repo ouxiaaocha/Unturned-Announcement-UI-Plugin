@@ -43,7 +43,7 @@
 
 ## 下载与安装
 
-1. 打开 GitHub Releases，下载 `Unturned-Announcement-UI-Plugin-v1.0.0.zip`。
+1. 打开 GitHub Releases，下载 `Announcement-UI-Plugin-v1.2.0.zip`。
 2. 解压后取得插件文件：`[基佬]UI公告.dll`。
 3. 将 DLL 放入 Rocket 插件目录：
 
